@@ -8,11 +8,14 @@ const SystemMetrics = require("../models/systemMetrices");
 router.post("/dashboard", async (req, res) => {
   try {
     const {
+      project_name,
       repository,
+      repository_full_name,
       branch,
       developer,
       commit_message,
       commit_url,
+      commit_id,
       timestamp,
       status,
     } = req.body;
@@ -24,23 +27,32 @@ router.post("/dashboard", async (req, res) => {
           ? "staging"
           : "development";
 
+    const deploymentStatus =
+      status === "success"
+        ? "success"
+        : status === "failed"
+          ? "failed"
+          : "pending";
+
+    const shortCommitId = commit_id ? commit_id.slice(0, 7) : "N/A";
+
     const deployment = await Deployment.create({
-      serviceName: repository || "unknown-repo",
-      version: "latest",
-      commitId: commit_url ? commit_url.split("/").pop() : "N/A",
+      serviceName: project_name || repository || "unknown-repo",
+      version: branch || "latest",
+      commitId: shortCommitId,
       environment,
-      status: status || "pending",
-      duration: 60,
+      status: deploymentStatus,
+      duration: deploymentStatus === "success" ? 120 : 0,
       owner: developer || "unknown",
       region: "ap-south-1",
       deployedAt: timestamp || new Date(),
     });
 
     await Log.create({
-      level: status === "failed" ? "error" : "info",
-      service: repository || "unknown-repo",
-      message: commit_message || "Workflow update received",
-      traceId: commit_url || "N/A",
+      level: deploymentStatus === "failed" ? "error" : "info",
+      service: project_name || repository || "unknown-repo",
+      message: `${commit_message || "Workflow update received"} | Repo: ${repository_full_name || repository || "unknown"} | Branch: ${branch || "unknown"} | Status: ${deploymentStatus}`,
+      traceId: shortCommitId,
       environment,
     });
 
