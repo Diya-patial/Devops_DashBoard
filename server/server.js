@@ -8,6 +8,7 @@ const deploymentRoutes = require("./routes/deployementRoutes");
 const healthRoutes = require("./routes/healthRoutes");
 const logRoutes = require("./routes/logRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
+const dashboardWebhookRoutes = require("./routes/dashboardWebhookRoutes");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/deployments", deploymentRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/webhooks", webhookRoutes);
+app.use("/api/dashboard-webhooks", dashboardWebhookRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

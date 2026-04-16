@@ -1,0 +1,27 @@
+name: Central Dashboard Notification
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  notify_dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify dashboard
+        env:
+          WEBHOOK_URL: ${{ secrets.DASHBOARD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{
+            "repository": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "developer": "${{ github.actor }}",
+            "commit_message": "${{ github.event.head_commit.message }}",
+            "commit_url": "${{ github.event.head_commit.url }}",
+            "timestamp": "${{ github.event.head_commit.timestamp }}",
+            "status": "success"
+          }' \
+          $WEBHOOK_URL
