@@ -13,7 +13,6 @@ const statusClasses = {
 
 function Badge({ status }) {
   const statusClass = statusClasses[status] || "statusPending";
-
   return (
     <span className={`${styles.statusBadge} ${styles[statusClass]}`}>
       <span className={styles.statusDot} />
@@ -57,7 +56,6 @@ export default function Dashboard() {
         });
 
         const maxCount = Math.max(...countsByDay, 1);
-
         const weeklyData = chartDays.map((day, index) => ({
           day,
           count: countsByDay[index],
@@ -71,13 +69,15 @@ export default function Dashboard() {
         setLoading(false);
       }
     }
-
     loadDashboard();
+    const interval = setInterval(() => {
+    loadDashboard(); // refresh every 5 sec
+  }, 5000);
+
+  return () => clearInterval(interval); 
   }, []);
 
-  const successCount = deployments.filter(
-    (item) => item.status === "success",
-  ).length;
+  const successCount = deployments.filter((item) => item.status === "success").length;
   const successRate = deployments.length
     ? `${((successCount / deployments.length) * 100).toFixed(1)}%`
     : "0%";
@@ -89,8 +89,7 @@ export default function Dashboard() {
       )} sec`
     : "0 sec";
 
-  const activeServices = new Set(deployments.map((item) => item.serviceName))
-    .size;
+  const activeServices = new Set(deployments.map((item) => item.serviceName)).size;
 
   const stats = [
     { label: "Total Deployments", value: String(deployments.length) },
@@ -101,46 +100,17 @@ export default function Dashboard() {
 
   const healthItems = latestHealth
     ? [
-        {
-          name: "CPU Usage",
-          value: latestHealth.cpuUsage || 0,
-          width: `${Math.min(latestHealth.cpuUsage || 0, 100)}%`,
-        },
-        {
-          name: "Memory Usage",
-          value: latestHealth.memoryUsage || 0,
-          width: `${Math.min(latestHealth.memoryUsage || 0, 100)}%`,
-        },
-        {
-          name: "Active Deploys",
-          value: latestHealth.activeDeploys || 0,
-          width: `${Math.min((latestHealth.activeDeploys || 0) * 10, 100)}%`,
-        },
-        {
-          name: "Critical Errors",
-          value: latestHealth.criticalErrors || 0,
-          width: `${Math.min((latestHealth.criticalErrors || 0) * 10, 100)}%`,
-        },
+        { name: "CPU Usage",      value: latestHealth.cpuUsage || 0,      width: `${Math.min(latestHealth.cpuUsage || 0, 100)}%` },
+        { name: "Memory Usage",   value: latestHealth.memoryUsage || 0,   width: `${Math.min(latestHealth.memoryUsage || 0, 100)}%` },
+        { name: "Active Deploys", value: latestHealth.activeDeploys || 0, width: `${Math.min((latestHealth.activeDeploys || 0) * 10, 100)}%` },
+        { name: "Critical Errors",value: latestHealth.criticalErrors || 0,width: `${Math.min((latestHealth.criticalErrors || 0) * 10, 100)}%` },
       ]
     : [];
 
   const recentActivity = deployments.slice(0, 5);
 
-  if (loading) {
-    return (
-      <div className={styles.page}>
-        <p>Loading dashboard...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.page}>
-        <p>Error: {error}</p>
-      </div>
-    );
-  }
+  if (loading) return <div className={styles.page}><p>Loading dashboard...</p></div>;
+  if (error)   return <div className={styles.page}><p>Error: {error}</p></div>;
 
   return (
     <div className={styles.page}>
@@ -173,16 +143,12 @@ export default function Dashboard() {
             <h2 className={styles.panelTitle}>Deployments</h2>
             <p className={styles.panelSub}>Last 7 days</p>
           </div>
-
           <div className={styles.chartWrap}>
             <div className={styles.chartBars}>
               {chartData.map((item) => (
                 <div key={item.day} className={styles.barCol}>
                   <div className={styles.barTrack}>
-                    <div
-                      className={styles.bar}
-                      style={{ height: item.height }}
-                    />
+                    <div className={styles.bar} style={{ height: item.height }} />
                   </div>
                   <span className={styles.barLabel}>{item.day}</span>
                 </div>
@@ -196,7 +162,6 @@ export default function Dashboard() {
             <h2 className={styles.panelTitle}>Server Health</h2>
             <p className={styles.panelSub}>Live metrics</p>
           </div>
-
           <div className={styles.healthList}>
             {healthItems.map((item) => (
               <div key={item.name} className={styles.healthRow}>
@@ -205,10 +170,7 @@ export default function Dashboard() {
                   <span className={styles.healthVal}>{item.value}</span>
                 </div>
                 <div className={styles.healthTrack}>
-                  <div
-                    className={styles.healthFill}
-                    style={{ width: item.width }}
-                  />
+                  <div className={styles.healthFill} style={{ width: item.width }} />
                 </div>
               </div>
             ))}
@@ -224,28 +186,29 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Environment</th>
-              <th>Status</th>
-              <th>Commit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentActivity.map((row) => (
-              <tr key={row._id} className={styles.tableRow}>
-                <td className={styles.tdService}>{row.serviceName}</td>
-                <td className={styles.tdMuted}>{row.environment}</td>
-                <td>
-                  <Badge status={row.status} />
-                </td>
-                <td className={styles.tdCommit}>{row.commitId || "N/A"}</td>
+        {/* tableWrapper enables horizontal scroll on mobile */}
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Environment</th>
+                <th>Status</th>
+                <th>Commit</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recentActivity.map((row) => (
+                <tr key={row._id} className={styles.tableRow}>
+                  <td className={styles.tdService}>{row.serviceName}</td>
+                  <td className={styles.tdMuted}>{row.environment}</td>
+                  <td><Badge status={row.status} /></td>
+                  <td className={styles.tdCommit}>{row.commitId || "N/A"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <p className={styles.panelSub}>Total logs: {logs.length}</p>
       </div>
