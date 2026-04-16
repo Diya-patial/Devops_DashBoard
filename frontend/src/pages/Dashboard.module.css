@@ -6,15 +6,8 @@
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .header {
@@ -49,18 +42,12 @@
 }
 
 @keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.3;
-  }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
 }
 
 .liveText {
-  font-family: "JetBrains Mono", monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   font-weight: 600;
   color: #10b981;
@@ -68,7 +55,7 @@
 }
 
 .headerSub {
-  font-family: "JetBrains Mono", monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--muted);
   letter-spacing: 1px;
@@ -89,9 +76,10 @@
   margin: 0;
 }
 
+/* Stats Grid */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
@@ -103,9 +91,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition:
-    border-color 0.2s,
-    transform 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
 .statCard:hover {
@@ -133,6 +119,7 @@
   color: var(--text);
 }
 
+/* Mid Grid */
 .midGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -162,19 +149,20 @@
 }
 
 .panelSub {
-  font-family: "JetBrains Mono", monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--muted);
   margin: 4px 0 0;
 }
 
+/* Status Badges */
 .statusBadge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  font-family: "JetBrains Mono", monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -188,29 +176,13 @@
   display: inline-block;
 }
 
-.statusSuccess {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
+.statusSuccess  { background: rgba(16,185,129,0.1);  color: #10b981; }
+.statusFailed   { background: rgba(239,68,68,0.1);   color: #ef4444; }
+.statusPending  { background: rgba(245,158,11,0.1);  color: #f59e0b; }
+.statusProgress { background: rgba(99,102,241,0.1);  color: #818cf8; }
 
-.statusFailed {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.statusPending {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-}
-
-.statusProgress {
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
-}
-
-.chartWrap {
-  width: 100%;
-}
+/* Chart */
+.chartWrap { width: 100%; }
 
 .chartBars {
   display: flex;
@@ -251,6 +223,7 @@
   color: var(--muted2);
 }
 
+/* Health */
 .healthList {
   display: flex;
   flex-direction: column;
@@ -294,9 +267,17 @@
   background: linear-gradient(90deg, #10b981, #6366f1);
 }
 
+/* Table */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 480px;
 }
 
 .table thead th {
@@ -305,6 +286,7 @@
   color: var(--muted);
   font-weight: 600;
   padding-bottom: 12px;
+  white-space: nowrap;
 }
 
 .tableRow td {
@@ -312,19 +294,17 @@
   border-top: 1px solid var(--border);
 }
 
-.tdService {
-  color: var(--text);
-  font-weight: 600;
-}
+.tdService { color: var(--text); font-weight: 600; }
+.tdMuted   { color: var(--muted2); }
+.tdCommit  { color: var(--accent2); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 
-.tdMuted {
-  color: var(--muted2);
-}
+/* ── Responsive ── */
 
-.tdCommit {
-  color: var(--accent2);
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
+/* Large tablets / small laptops */
+@media (max-width: 1100px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 860px) {
@@ -338,11 +318,47 @@
     font-size: 26px;
   }
 
+  .statValue {
+    font-size: 28px;
+  }
+
   .panel {
-    padding: 18px;
+    padding: 16px;
   }
 
   .chartBars {
     gap: 6px;
+    height: 140px;
+  }
+
+  .barLabel {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .statCard {
+    padding: 16px;
+  }
+
+  .statValue {
+    font-size: 24px;
+  }
+
+  .statLabel {
+    font-size: 12px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .panelTitle {
+    font-size: 14px;
   }
 }

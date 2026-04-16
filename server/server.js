@@ -1,19 +1,15 @@
 require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
 
-const connectDB = require("./config/db");
+const app=require("./src/app")
 
-const deploymentRoutes = require("./routes/deployementRoutes");
-const healthRoutes = require("./routes/healthRoutes");
-const logRoutes = require("./routes/logRoutes");
+const connectDB = require("./src/config/db");
+
 
 const dashboardWebhookRoutes = require("./routes/dashboardWebhookRoutes");
 
-const app = express();
 
-app.use(express.json());
-app.use(cors());
+
+
 
 connectDB();
 
@@ -21,9 +17,7 @@ app.get("/", (req, res) => {
   res.send("DevOps Deployment Monitoring API is running...");
 });
 
-app.use("/api/deployments", deploymentRoutes);
-app.use("/api/health", healthRoutes);
-app.use("/api/logs", logRoutes);
+
 
 app.use("/api/dashboard-webhooks", dashboardWebhookRoutes);
 

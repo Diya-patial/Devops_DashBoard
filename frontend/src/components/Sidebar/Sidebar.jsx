@@ -1,49 +1,91 @@
-import { useState, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
-import { MdOutlineSpaceDashboard } from 'react-icons/md'
-import { VscServerProcess } from 'react-icons/vsc'
-import { BsTerminal } from 'react-icons/bs'
-import { TbLayoutDashboard } from 'react-icons/tb'
-import styles from './Sidebar.module.css'
+import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { VscServerProcess } from "react-icons/vsc";
+import { BsTerminal } from "react-icons/bs";
+import { TbLayoutDashboard } from "react-icons/tb";
+import styles from "./Sidebar.module.css";
 
 const links = [
-  { to: '/',            icon: <MdOutlineSpaceDashboard />, label: 'Dashboard',   sub: 'Overview'  },
-  { to: '/deployments', icon: <VscServerProcess />,        label: 'Deployments', sub: 'Pipeline'  },
-  { to: '/logs',        icon: <BsTerminal />,              label: 'Logs',        sub: 'Activity'  },
-]
+  {
+    to: "/dashboard",
+    icon: <MdOutlineSpaceDashboard />,
+    label: "Dashboard",
+    sub: "Overview",
+  },
+  {
+    to: "/deployments",
+    icon: <VscServerProcess />,
+    label: "Deployments",
+    sub: "Pipeline",
+  },
+  { to: "/logs", icon: <BsTerminal />, label: "Logs", sub: "Activity" },
+];
 
 function Sidebar({ expanded, setExpanded }) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 768
-      setIsMobile(mobile)
-      if (!mobile && !expanded) setExpanded(false)
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setExpanded(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setExpanded]);
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (isMobile && expanded) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [expanded, setExpanded])
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobile, expanded]);
+
+  const isDrawerOpen = isMobile && expanded;
 
   return (
     <>
-      {/* Overlay — mobile only */}
-      {isMobile && expanded && (
+      {/* Blurred overlay — mobile only, shown when sidebar is open */}
+      {isDrawerOpen && (
         <div className={styles.overlay} onClick={() => setExpanded(false)} />
       )}
 
-      <aside className={`${styles.sidebar} ${expanded ? styles.expanded : styles.collapsed} ${isMobile ? styles.mobile : ''}`}>
+      <aside
+        className={[
+          styles.sidebar,
+          isMobile ? styles.mobile : "",
+          isMobile
+            ? expanded
+              ? styles.mobileOpen
+              : styles.mobileClosed
+            : expanded
+              ? styles.expanded
+              : styles.collapsed,
+        ].join(" ")}
+      >
         <div className={styles.gradientEdge} />
 
         <button
           className={styles.toggleBtn}
           onClick={() => setExpanded(!expanded)}
-          title={expanded ? 'Collapse' : 'Expand'}
+          title={expanded ? "Collapse" : "Expand"}
         >
-          <span className={`${styles.toggleIcon} ${expanded ? styles.rotated : ''}`}>›</span>
+          <span
+            className={`${styles.toggleIcon} ${expanded ? styles.rotated : ""}`}
+          >
+            ›
+          </span>
         </button>
 
-        <div className={`${styles.logo} ${!expanded ? styles.logoCentered : ''}`}>
+        <div
+          className={`${styles.logo} ${!expanded ? styles.logoCentered : ""}`}
+        >
           <div className={styles.logoMark}>
             <TbLayoutDashboard className={styles.logoIcon} />
           </div>
@@ -63,11 +105,11 @@ function Sidebar({ expanded, setExpanded }) {
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={to === "/"}
               className={({ isActive }) =>
                 isActive ? `${styles.link} ${styles.active}` : styles.link
               }
-              title={!expanded ? label : ''}
+              title={!expanded ? label : ""}
               onClick={() => isMobile && setExpanded(false)}
             >
               <span className={styles.linkIcon}>{icon}</span>
@@ -105,10 +147,10 @@ function Sidebar({ expanded, setExpanded }) {
 
         <div className={styles.divider} />
 
-        <div className={styles.user} title={!expanded ? 'Karan S.' : ''}>
+        <div className={styles.user} title={!expanded ? "Karan S." : ""}>
           <div className={styles.avatar}>KS</div>
           {expanded && (
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ flex: 1, overflow: "hidden" }}>
               <p className={styles.userName}>Karan S.</p>
               <p className={styles.userRole}>Frontend Dev</p>
             </div>
@@ -117,7 +159,7 @@ function Sidebar({ expanded, setExpanded }) {
         </div>
       </aside>
     </>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: "http://localhost:5000/api",
+   withCredentials: true,
+
 });
 
 export const getDeployments = () => api.get("/deployments");
@@ -12,4 +14,11 @@ export const createDeployment = (data) => api.post("/deployments", data);
 export const createLog = (data) => api.post("/logs", data);
 export const createHealthMetric = (data) => api.post("/health", data);
 
+
+
+
+export const register = (data) => api.post("/auth/register", data);
+export const login    = (data) => api.post("/auth/login", data);
+export const logout   = ()     => api.get("/auth/logout");
+export const getMe    = ()     => api.get("/auth/me");
 export default api;
